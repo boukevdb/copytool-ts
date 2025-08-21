@@ -1,8 +1,12 @@
-import type { FormValues, Brand } from '@/types';
+import type { FormValues, Brand, GeneratedContentData } from '@/types';
 
 interface ClaudeMessage {
   role: 'user' | 'assistant';
-  content: string;
+  content?: string | Array<{
+    type: 'text';
+    text: string;
+  }>;
+  text?: string;
 }
 
 interface ClaudeRequest {
@@ -51,7 +55,7 @@ export class ClaudeService {
   private buildPrompt(formData: FormValues, brand?: Brand): string {
     const contentType = formData.contentType;
     const language = formData.language || 'Dutch';
-    const model = formData.model || 'claude-3-5-sonnet-20241022';
+    const model = formData.model || 'claude-3-7-sonnet-20250219';
     
     let prompt = `Je bent een professionele content schrijver. Schrijf ${language} content voor een ${contentType}.\n\n`;
 
@@ -136,17 +140,69 @@ export class ClaudeService {
       prompt += `\n## Extra Context:\n${formData.additionalContext}\n`;
     }
 
-    prompt += `\n## Output:\nSchrijf de content in ${language}. Zorg voor een professionele, engageerende toon die past bij de brand guidelines.`;
+    prompt += `\n## Output Format:\nGeef je antwoord in het volgende JSON formaat:\n\n`;
+    
+    switch (contentType) {
+      case 'blog-post':
+        prompt += `{
+  "metaTitle": "SEO-geoptimaliseerde titel (max 60 karakters)",
+  "metaDescription": "SEO-geoptimaliseerde beschrijving (max 160 karakters)",
+  "h1": "Hoofdtitel van de blog post",
+  "intro": "Inleidende paragraaf die de lezer engageert",
+  "mainContent": "De volledige blog post content met alle secties",
+  "sections": [
+    {
+      "header": "H2 titel",
+      "headerType": "h2",
+      "content": "Content van deze sectie"
+    }
+  ]
+}`;
+        break;
+        
+      case 'web-page':
+        prompt += `{
+  "metaTitle": "SEO-geoptimaliseerde titel (max 60 karakters)",
+  "metaDescription": "SEO-geoptimaliseerde beschrijving (max 160 karakters)",
+  "h1": "Hoofdtitel van de pagina",
+  "intro": "Inleidende tekst",
+  "mainContent": "De volledige pagina content"
+}`;
+        break;
+        
+      case 'email':
+        prompt += `{
+  "emailSubject": "Email onderwerp regel",
+  "emailPreheader": "Preheader tekst (max 150 karakters)",
+  "mainContent": "De volledige email content"
+}`;
+        break;
+        
+      case 'social-media':
+        prompt += `{
+  "socialMediaPost": "De social media post tekst",
+  "hashtags": ["hashtag1", "hashtag2", "hashtag3"],
+  "callToAction": "Call-to-action tekst"
+}`;
+        break;
+        
+      default:
+        prompt += `{
+  "mainContent": "De gegenereerde content"
+}`;
+    }
+
+    prompt += `\n\nZorg ervoor dat je antwoord alleen geldige JSON is zonder extra tekst ervoor of erna.`;
 
     return prompt;
   }
 
-  async generateContent(formData: FormValues, brand?: Brand): Promise<string> {
+  async generateContent(formData: FormValues, brand?: Brand): Promise<GeneratedContentData> {
     try {
       const prompt = this.buildPrompt(formData, brand);
       
       const request: ClaudeRequest = {
-        model: formData.model || 'claude-3-5-sonnet-20241022',
+        model: formData.model || 'claude-3-7-sonnet-20250219',
         max_tokens: 4000,
         messages: [
           {
@@ -160,11 +216,54 @@ export class ClaudeService {
       const response = await this.makeRequest(request);
       
       // Extract content from response
-      const content = response.content[0]?.text || 'Geen content gegenereerd';
+      let contentText = '';
       
-      console.log('Claude API Usage:', response.usage);
+      // Try different content extraction methods
+      if (typeof response.content[0]?.content === 'string') {
+        contentText = response.content[0].content;
+      } else if (Array.isArray(response.content[0]?.content)) {
+        contentText = response.content[0].content
+          .filter((item: any) => item.type === 'text')
+          .map((item: any) => item.text)
+          .join('');
+      } else if (typeof response.content[0]?.text === 'string') {
+        // Direct text property
+        contentText = response.content[0].text;
+      }
       
-      return content;
+      if (!contentText) {
+        throw new Error('Geen content gegenereerd');
+      }
+      
+      // Try to parse as JSON
+      try {
+        // Remove markdown code blocks if present
+        let jsonText = contentText;
+        if (jsonText.includes('```json')) {
+          jsonText = jsonText.replace(/```json\n?/g, '').replace(/```\n?/g, '');
+        }
+        if (jsonText.includes('```')) {
+          jsonText = jsonText.replace(/```\n?/g, '');
+        }
+        
+        // Trim whitespace
+        jsonText = jsonText.trim();
+        
+        const parsedContent = JSON.parse(jsonText);
+        return {
+          contentType: formData.contentType,
+          ...parsedContent
+        };
+      } catch (parseError) {
+        // Fallback to plain text if JSON parsing fails
+        console.warn('Failed to parse JSON response, falling back to plain text:', parseError);
+        console.warn('Raw content:', contentText);
+        return {
+          contentType: formData.contentType,
+          mainContent: contentText
+        };
+      }
+      
     } catch (error) {
       console.error('Content generation error:', error);
       throw error;
@@ -192,7 +291,7 @@ Geef ook een voorstel voor een H2 sectie die we kunnen toevoegen aan onze conten
 `;
 
       const request: ClaudeRequest = {
-        model: 'claude-3-5-sonnet-20241022',
+        model: 'claude-3-7-sonnet-20250219',
         max_tokens: 2000,
         messages: [
           {
@@ -204,7 +303,22 @@ Geef ook een voorstel voor een H2 sectie die we kunnen toevoegen aan onze conten
       };
 
       const response = await this.makeRequest(request);
-      return response.content[0]?.text || 'Geen analyse beschikbaar';
+      
+      // Extract content from response
+      let contentText = '';
+      if (typeof response.content[0]?.content === 'string') {
+        contentText = response.content[0].content;
+      } else if (Array.isArray(response.content[0]?.content)) {
+        contentText = response.content[0].content
+          .filter((item: any) => item.type === 'text')
+          .map((item: any) => item.text)
+          .join('');
+      } else if (typeof response.content[0]?.text === 'string') {
+        // Direct text property
+        contentText = response.content[0].text;
+      }
+      
+      return contentText || 'Geen analyse beschikbaar';
     } catch (error) {
       console.error('SERP analysis error:', error);
       throw error;

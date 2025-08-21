@@ -15,7 +15,7 @@ import { claudeService } from '@/services/claudeService';
 const formSchema = z.object({
   contentType: z.string().min(1, "Content type is required"),
   language: z.string(),
-  model: z.string().default("claude-3-5-sonnet-20241022"),
+  model: z.string().default("claude-3-7-sonnet-20250219"),
   focusKeyword: z.string().optional(),
   secondaryKeywords: z.string().optional(),
   minWordCount: z.string().optional(),

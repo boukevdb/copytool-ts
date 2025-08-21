@@ -18,6 +18,33 @@ export interface FormValues {
   socialMediaType?: string;
   emailType?: string;
   exampleText?: string;
+  pageTitle?: string;
+  pageDescription?: string;
+  emailSubject?: string;
+  platform?: string;
+  postType?: string;
+  adType?: string;
+  targetAudience?: string;
+  additionalContext?: string;
+}
+
+export interface GeneratedContentData {
+  contentType: string;
+  mainContent: string;
+  metaTitle?: string;
+  metaDescription?: string;
+  h1?: string;
+  intro?: string;
+  sections?: Array<{
+    header: string;
+    headerType: string;
+    content: string;
+  }>;
+  emailSubject?: string;
+  emailPreheader?: string;
+  socialMediaPost?: string;
+  hashtags?: string[];
+  callToAction?: string;
 }
 
 export interface EmailContent {

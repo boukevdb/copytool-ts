@@ -5,24 +5,9 @@ import { UseFormReturn } from 'react-hook-form';
 
 const models = [
   {
-    value: "claude-3-5-sonnet-20241022",
-    label: "Claude 3.5 Sonnet",
+    value: "claude-3-7-sonnet-20250219",
+    label: "Claude 3.7 Sonnet",
     description: "Latest and most capable model",
-  },
-  {
-    value: "claude-3-opus-20240229",
-    label: "Claude 3 Opus",
-    description: "Most powerful model for complex tasks",
-  },
-  {
-    value: "claude-3-sonnet-20240229",
-    label: "Claude 3 Sonnet",
-    description: "Balanced performance and speed",
-  },
-  {
-    value: "claude-3-haiku-20240307",
-    label: "Claude 3 Haiku",
-    description: "Fastest and most cost-effective",
   },
 ];
 
@@ -38,7 +23,7 @@ export function ModelSelector({ form }: ModelSelectorProps) {
       render={({ field }) => (
         <FormItem>
           <FormLabel>AI Model</FormLabel>
-          <Select onValueChange={field.onChange} value={field.value}>
+          <Select onValueChange={field.onChange} value={field.value} disabled>
             <FormControl>
               <SelectTrigger>
                 <SelectValue placeholder="Selecteer een AI model" />

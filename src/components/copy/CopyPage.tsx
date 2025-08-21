@@ -6,12 +6,12 @@ import { ContentForm, type FormValues } from './content-form/ContentForm';
 import { GeneratedContent } from './GeneratedContent';
 import { claudeService } from '@/services/claudeService';
 import { FileText } from 'lucide-react';
-import type { Brand } from '@/types';
+import type { Brand, GeneratedContentData } from '@/types';
 import { toast } from 'sonner';
 
 export function CopyPage() {
   const [selectedBrandId, setSelectedBrandId] = useState<string>('');
-  const [generatedContent, setGeneratedContent] = useState<string>('');
+  const [generatedContent, setGeneratedContent] = useState<GeneratedContentData | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
 
   // Fetch brands
@@ -81,7 +81,6 @@ export function CopyPage() {
             <div className="mt-8">
               <GeneratedContent
                 content={generatedContent}
-                contentType="blog-post"
                 onEdit={(editedContent) => {
                   setGeneratedContent(editedContent);
                 }}
