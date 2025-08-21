@@ -6,6 +6,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Hash, AlignLeft, Target, MessageSquare, ListPlus, FileText, Share2, Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { SectionBuilder } from './SectionBuilder';
 
 const socialMediaTypes = [
   "Facebook Ad",
@@ -227,6 +228,10 @@ export function ContentTypeFields({ form, contentType, onOpenSerpAnalyzer }: Con
             </>
           )}
         </div>
+
+        {(contentType === "blog-post" || contentType === "web-page" || contentType === "email") && (
+          <SectionBuilder form={form} />
+        )}
       </div>
     );
   }

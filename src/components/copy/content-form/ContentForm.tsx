@@ -9,6 +9,8 @@ import { ContentTypeSelector } from './ContentTypeSelector';
 import { ContentTypeFields } from './ContentTypeFields';
 import { LanguageSelector } from './LanguageSelector';
 import { ModelSelector } from './ModelSelector';
+import { SerpAnalyzerModal } from '../../serp-analyzer/SerpAnalyzerModal';
+import { claudeService } from '@/services/claudeService';
 
 const formSchema = z.object({
   contentType: z.string().min(1, "Content type is required"),
@@ -78,6 +80,18 @@ export function ContentForm({ onSubmit, isGenerating, brandRules }: ContentFormP
     }
   };
 
+  // Callback function for the modal to add content as a new section
+  const handleAddSectionFromSerp = (sectionData: { headerType: string; headerSubject: string; content: string }) => {
+    const currentSections = form.getValues("sections") || [];
+    form.setValue("sections", [
+      ...currentSections,
+      {
+        id: Date.now().toString(),
+        ...sectionData
+      }
+    ]);
+  };
+
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(handleFormSubmit)} className="space-y-8">
@@ -115,6 +129,16 @@ export function ContentForm({ onSubmit, isGenerating, brandRules }: ContentFormP
           </Button>
         )}
       </form>
+
+      {/* SERP Analyzer Modal */}
+      <SerpAnalyzerModal
+        isOpen={isSerpAnalyzerOpen}
+        onClose={() => setIsSerpAnalyzerOpen(false)}
+        focusKeyword={focusKeywordValue}
+        onAddSection={handleAddSectionFromSerp}
+        googleApiKey={process.env.VITE_GOOGLE_API_KEY}
+        googleCx={process.env.VITE_GOOGLE_CX}
+      />
     </Form>
   );
 }
