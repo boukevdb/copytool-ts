@@ -9,7 +9,7 @@ npm run build
 
 # Upload naar server
 echo "📤 Uploading to server..."
-scp -r dist/* transip:/data/sites/web/boukevdbergcom/www/copytool/
+scp -r dist transip:/data/sites/web/boukevdbergcom/www/copytool/
 
 # Upload .htaccess
 echo "🔐 Uploading .htaccess..."

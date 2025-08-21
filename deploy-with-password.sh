@@ -5,7 +5,12 @@ echo "🚀 Start CopyTool deployment..."
 
 # Build de React app
 echo "📦 Building React app..."
-npm run build
+npx vite build --mode production
+
+# Fix asset paths in index.html
+echo "🔧 Fixing asset paths..."
+sed -i '' 's|src="./assets/|src="./dist/assets/|g' dist/index.html
+sed -i '' 's|href="./assets/|href="./dist/assets/|g' dist/index.html
 
 # Functie om SSH commando's uit te voeren met automatisch wachtwoord
 ssh_with_password() {
@@ -40,7 +45,7 @@ scp_with_password() {
 
 # Upload naar server
 echo "📤 Uploading to server..."
-scp_with_password "-r dist/*" "boukevdbergcom@boukew.ssh.transip.me:/data/sites/web/boukevdbergcom/www/copytool/"
+scp_with_password "-r dist" "boukevdbergcom@boukew.ssh.transip.me:/data/sites/web/boukevdbergcom/www/copytool/"
 
 # Upload .htaccess
 echo "🔐 Uploading .htaccess..."

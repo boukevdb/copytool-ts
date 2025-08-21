@@ -1,0 +1,9 @@
+AuthType Basic
+AuthName "CopyTool - Beveiligde Omgeving"
+AuthUserFile /data/sites/web/boukevdbergcom/www/copytool/.htpasswd
+Require valid-user
+
+# Headers voor CORS en security
+Header always set Access-Control-Allow-Origin "*"
+Header always set Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
+Header always set Access-Control-Allow-Headers "Content-Type, Authorization"

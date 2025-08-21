@@ -1,0 +1,20 @@
+AuthType Basic
+AuthName "CopyTool - Beveiligde Omgeving"
+AuthUserFile /data/sites/web/boukevdbergcom/www/copytool/.htpasswd
+Require valid-user
+
+# Zorg ervoor dat de React app correct werkt
+RewriteEngine On
+RewriteBase /copytool/
+
+# Serve static files directly
+RewriteCond %{REQUEST_FILENAME} -f
+RewriteRule ^ - [L]
+
+# Serve index.html for all other requests (SPA routing)
+RewriteRule ^ dist/index.html [L]
+
+# Headers voor CORS en security
+Header always set Access-Control-Allow-Origin "*"
+Header always set Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
+Header always set Access-Control-Allow-Headers "Content-Type, Authorization"
