@@ -81,7 +81,42 @@ export interface PromptLog {
 export interface Brand {
   id: string;
   name: string;
+  slug: string;
   description?: string;
+  brand_guidelines?: string;
+  tone_of_voice?: string;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface BrandRule {
+  id: string;
+  brand_id: string;
+  type: string;
+  name: string;
+  description: string;
+  examples?: string[];
+  wrong_examples?: string[];
+  pattern?: string;
+  alternative?: string;
+  content_type?: string;
+  created_at?: string;
+  sort_order?: number;
+}
+
+export interface BrandColor {
+  id: string;
+  type: "primary" | "secondary" | "accent";
+  value: string;
+  brand_id: string;
+}
+
+export interface BrandLogo {
+  id: string;
+  brand_id: string;
+  url: string;
+  type: "primary" | "secondary";
   created_at: string;
 }
 

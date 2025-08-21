@@ -15,11 +15,50 @@ CREATE TABLE IF NOT EXISTS users (
 CREATE TABLE IF NOT EXISTS brands (
     id TEXT PRIMARY KEY,
     name TEXT NOT NULL,
+    slug TEXT UNIQUE NOT NULL,
     description TEXT,
     brand_guidelines TEXT,
     tone_of_voice TEXT,
+    is_active BOOLEAN DEFAULT TRUE,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Brand rules table (voor brand guidelines en tone of voice)
+CREATE TABLE IF NOT EXISTS brand_rules (
+    id TEXT PRIMARY KEY,
+    brand_id TEXT NOT NULL,
+    type TEXT NOT NULL,
+    name TEXT NOT NULL,
+    description TEXT NOT NULL,
+    examples TEXT,
+    wrong_examples TEXT,
+    pattern TEXT,
+    alternative TEXT,
+    content_type TEXT,
+    sort_order INTEGER DEFAULT 0,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (brand_id) REFERENCES brands(id) ON DELETE CASCADE
+);
+
+-- Brand colors table
+CREATE TABLE IF NOT EXISTS brand_colors (
+    id TEXT PRIMARY KEY,
+    brand_id TEXT NOT NULL,
+    type TEXT NOT NULL,
+    value TEXT NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (brand_id) REFERENCES brands(id) ON DELETE CASCADE
+);
+
+-- Brand logos table
+CREATE TABLE IF NOT EXISTS brand_logos (
+    id TEXT PRIMARY KEY,
+    brand_id TEXT NOT NULL,
+    url TEXT NOT NULL,
+    type TEXT NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (brand_id) REFERENCES brands(id) ON DELETE CASCADE
 );
 
 -- Content types table (voor categorisering)

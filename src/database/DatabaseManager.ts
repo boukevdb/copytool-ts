@@ -80,24 +80,33 @@ export class DatabaseManager {
   // Brand management
   async createBrand(name: string, description?: string, brandGuidelines?: any, toneOfVoice?: any): Promise<Brand> {
     const id = uuidv4();
+    const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+    
     const stmt = this.db.prepare(`
-      INSERT INTO brands (id, name, description, brand_guidelines, tone_of_voice)
-      VALUES (?, ?, ?, ?, ?)
+      INSERT INTO brands (id, name, slug, description, brand_guidelines, tone_of_voice, is_active)
+      VALUES (?, ?, ?, ?, ?, ?, ?)
     `);
     
     stmt.run(
       id, 
-      name, 
+      name,
+      slug,
       description, 
       brandGuidelines ? JSON.stringify(brandGuidelines) : null,
-      toneOfVoice ? JSON.stringify(toneOfVoice) : null
+      toneOfVoice ? JSON.stringify(toneOfVoice) : null,
+      1
     );
     
     return {
       id,
       name,
+      slug,
       description,
-      created_at: new Date().toISOString()
+      brand_guidelines: brandGuidelines ? JSON.stringify(brandGuidelines) : undefined,
+      tone_of_voice: toneOfVoice ? JSON.stringify(toneOfVoice) : undefined,
+      is_active: true,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
     };
   }
 
@@ -108,8 +117,13 @@ export class DatabaseManager {
     return brands.map(brand => ({
       id: brand.id,
       name: brand.name,
+      slug: brand.slug,
       description: brand.description,
-      created_at: brand.created_at
+      brand_guidelines: brand.brand_guidelines,
+      tone_of_voice: brand.tone_of_voice,
+      is_active: brand.is_active,
+      created_at: brand.created_at,
+      updated_at: brand.updated_at
     }));
   }
 
@@ -122,8 +136,13 @@ export class DatabaseManager {
     return {
       id: brand.id,
       name: brand.name,
+      slug: brand.slug,
       description: brand.description,
-      created_at: brand.created_at
+      brand_guidelines: brand.brand_guidelines,
+      tone_of_voice: brand.tone_of_voice,
+      is_active: brand.is_active,
+      created_at: brand.created_at,
+      updated_at: brand.updated_at
     };
   }
 
