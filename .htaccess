@@ -1,0 +1,15 @@
+AuthType Basic
+AuthName "CopyTool - Beveiligde Omgeving"
+AuthUserFile /data/sites/web/boukevdbergcom/www/copytool/.htpasswd
+Require valid-user
+
+# Zorg ervoor dat de React app correct werkt
+RewriteEngine On
+RewriteBase /copytool/
+
+# Serve static files directly
+RewriteCond %{REQUEST_FILENAME} -f
+RewriteRule ^ - [L]
+
+# Serve index.html for all other requests (SPA routing)
+RewriteRule ^ index.html [L]
