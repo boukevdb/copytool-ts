@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { databaseService } from '@/services/databaseService';
 import { BrandSelector } from '@/components/settings/BrandSelector';
 import { ContentForm, type FormValues } from './content-form/ContentForm';
+import { GeneratedContent } from './GeneratedContent';
 import { claudeService } from '@/services/claudeService';
 import { FileText } from 'lucide-react';
 import type { Brand } from '@/types';
@@ -10,6 +11,8 @@ import { toast } from 'sonner';
 
 export function CopyPage() {
   const [selectedBrandId, setSelectedBrandId] = useState<string>('');
+  const [generatedContent, setGeneratedContent] = useState<string>('');
+  const [isGenerating, setIsGenerating] = useState(false);
 
   // Fetch brands
   const { data: brands = [] } = useQuery({
@@ -50,28 +53,41 @@ export function CopyPage() {
           <ContentForm
             onSubmit={async (data: FormValues) => {
               try {
+                setIsGenerating(true);
                 console.log('Form submitted:', data);
                 
                 // Get selected brand if available
                 const selectedBrand = brands?.find(brand => brand.id === selectedBrandId);
                 
                 // Generate content using Claude API
-                const generatedContent = await claudeService.generateContent(data, selectedBrand);
+                const content = await claudeService.generateContent(data, selectedBrand);
                 
-                console.log('Generated content:', generatedContent);
+                console.log('Generated content:', content);
+                setGeneratedContent(content);
                 toast.success('Content generated successfully!');
-                
-                // TODO: Save to database and show in preview
-                // For now, just log the content
                 
               } catch (error) {
                 console.error('Generation error:', error);
                 toast.error('Failed to generate content');
+              } finally {
+                setIsGenerating(false);
               }
             }}
-            isGenerating={false}
+            isGenerating={isGenerating}
             brandRules={[]}
           />
+          
+          {generatedContent && (
+            <div className="mt-8">
+              <GeneratedContent
+                content={generatedContent}
+                contentType="blog-post"
+                onEdit={(editedContent) => {
+                  setGeneratedContent(editedContent);
+                }}
+              />
+            </div>
+          )}
         </div>
         ) : (
           <div className="text-center text-muted-foreground p-8">

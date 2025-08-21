@@ -70,9 +70,9 @@ export function SerpAnalyzerModal({
     
     try {
       if (googleApiKey && googleCx) {
-        // Echte Google Custom Search API call
+        // Echte Google Custom Search API call via backend
         const response = await fetch(
-          `https://www.googleapis.com/customsearch/v1?key=${googleApiKey}&cx=${googleCx}&q=${encodeURIComponent(focusKeyword)}&num=10`
+          `http://localhost:3001/api/google/search?key=${googleApiKey}&cx=${googleCx}&q=${encodeURIComponent(focusKeyword)}`
         );
         
         if (!response.ok) {

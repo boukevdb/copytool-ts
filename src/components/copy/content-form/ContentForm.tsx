@@ -136,8 +136,8 @@ export function ContentForm({ onSubmit, isGenerating, brandRules }: ContentFormP
         onClose={() => setIsSerpAnalyzerOpen(false)}
         focusKeyword={focusKeywordValue}
         onAddSection={handleAddSectionFromSerp}
-        googleApiKey={process.env.VITE_GOOGLE_API_KEY}
-        googleCx={process.env.VITE_GOOGLE_CX}
+        googleApiKey={import.meta.env.VITE_GOOGLE_API_KEY}
+        googleCx={import.meta.env.VITE_GOOGLE_CX}
       />
     </Form>
   );

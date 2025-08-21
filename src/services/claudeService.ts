@@ -21,26 +21,19 @@ interface ClaudeResponse {
 }
 
 export class ClaudeService {
-  private apiKey: string;
-  private baseUrl = 'https://api.anthropic.com/v1/messages';
-
-  constructor(apiKey?: string) {
-    this.apiKey = apiKey || process.env.VITE_ANTHROPIC_API_KEY || '';
-  }
+  private baseUrl = 'http://localhost:3001/api';
 
   private async makeRequest(request: ClaudeRequest): Promise<ClaudeResponse> {
-    if (!this.apiKey) {
-      throw new Error('Anthropic API key is required');
-    }
-
-    const response = await fetch(this.baseUrl, {
+    const response = await fetch(`${this.baseUrl}/claude/generate`, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': this.apiKey,
-        'anthropic-version': '2023-06-01'
+        'Content-Type': 'application/json'
       },
-      body: JSON.stringify(request)
+      body: JSON.stringify({
+        prompt: request.messages[0].content,
+        model: request.model,
+        maxTokens: request.max_tokens
+      })
     });
 
     if (!response.ok) {
