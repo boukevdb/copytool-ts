@@ -1,0 +1,27 @@
+{
+  "name": "tov-tool",
+  "version": "1.0.0",
+  "description": "Een TypeScript tool",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "start": "node dist/index.js",
+    "clean": "rm -rf dist",
+    "test": "jest",
+    "serve": "npx http-server public -p 3000 -o",
+    "dev:web": "npm run build && npm run serve"
+  },
+  "keywords": ["typescript", "tool"],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0",
+    "jest": "^29.0.0",
+    "@types/jest": "^29.0.0",
+    "ts-jest": "^29.0.0",
+    "http-server": "^14.1.1"
+  },
+  "dependencies": {}
+}
